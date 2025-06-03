@@ -21,12 +21,18 @@ export class HTTPAxios {
             timeout: Infinity
         });
 
-        this.axios.interceptors.request.use(async config => {
-            config.headers.set(this.header)
-            return config;
-        }, error => {
-            return Promise.reject(error);
-        });
+        this.axios.interceptors.request.use(
+            async config => {
+                config.headers = {
+                    ...config.headers,
+                    ...this.header,
+                };
+                return config;
+            },
+            error => {
+                return Promise.reject(error);
+            }
+        );
 
     }
 

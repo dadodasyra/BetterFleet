@@ -89,14 +89,20 @@ public class SessionManager {
      * @param player The player to remove from their session.
      */
     public void leaveSession(Player player) {
-        for (Fleet fleet : sessions.values()) {
-            fleet.getPlayers().remove(player);
-            SessionSocket.broadcastSessionUpdate(fleet.getSessionId());
-            Log.info("[" + fleet.getSessionId() + "] " + player.getUsername() + " Leave the session !");
+        var iterator = sessions.entrySet().iterator();
+        while (iterator.hasNext()) {
+            var entry = iterator.next();
+            Fleet fleet = entry.getValue();
+
+            boolean removed = fleet.getPlayers().remove(player);
+            if (removed) {
+                SessionSocket.broadcastSessionUpdate(fleet.getSessionId());
+                Log.info("[" + fleet.getSessionId() + "] " + player.getUsername() + " Leave the session !");
+            }
 
             // Clean empty session
             if (fleet.getPlayers().isEmpty()) {
-                sessions.remove(fleet.getSessionId());
+                iterator.remove();
                 Log.info("[" + fleet.getSessionId() + "] Has been disbanded");
             }
         }
